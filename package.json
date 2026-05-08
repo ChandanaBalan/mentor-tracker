@@ -1,0 +1,7 @@
+{
+  "name": "mentor-tracker",
+  "private": true,
+  "scripts": {
+    "build": "bash scripts/vercel_build.sh"
+  }
+}

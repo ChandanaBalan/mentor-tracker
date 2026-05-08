@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs on Vercel’s Linux builders (not on your Windows machine).
+# Runs on Vercel Linux builders (not on your Windows machine).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 

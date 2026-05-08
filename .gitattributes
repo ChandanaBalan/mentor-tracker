@@ -1,0 +1,2 @@
+# Vercel runs this script on Linux; CRLF breaks shebang / bash.
+scripts/vercel_build.sh text eol=lf
