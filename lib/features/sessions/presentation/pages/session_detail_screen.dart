@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'dart:math';
+import 'package:uuid/uuid.dart';
 import '../providers/session_provider.dart';
 import '../../domain/entities/session_entity.dart';
 
@@ -49,24 +49,30 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
     super.dispose();
   }
 
-  void _saveSession() {
-    if (_formKey.currentState!.validate()) {
-      final provider = Provider.of<SessionProvider>(context, listen: false);
-      
-      final session = SessionEntity(
-        id: widget.session?.id ?? Random().nextInt(1000000).toString(),
-        mentorName: _mentorNameCtrl.text,
-        menteeName: _menteeNameCtrl.text,
-        date: _selectedDate,
-        sessionNumber: int.parse(_sessionNumberCtrl.text),
-        topicsDiscussed: _topicsCtrl.text,
-        actionItems: _actionsCtrl.text,
-        mentorComments: _mentorCommentsCtrl.text, // Guaranteed to save even if empty
-      );
+  Future<void> _saveSession() async {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
 
-      provider.saveSession(session);
-      
-      Navigator.pop(context);
+    final provider = Provider.of<SessionProvider>(context, listen: false);
+
+    final session = SessionEntity(
+      id: widget.session?.id ?? const Uuid().v4(),
+      mentorName: _mentorNameCtrl.text,
+      menteeName: _menteeNameCtrl.text,
+      date: _selectedDate,
+      sessionNumber: int.parse(_sessionNumberCtrl.text),
+      topicsDiscussed: _topicsCtrl.text,
+      actionItems: _actionsCtrl.text,
+      mentorComments: _mentorCommentsCtrl.text,
+    );
+
+    try {
+      await provider.saveSession(session);
+      if (mounted) Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not save to Supabase: $e')),
+      );
     }
   }
 
@@ -108,9 +114,16 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
           if (widget.session != null)
             IconButton(
               icon: const Icon(Icons.delete, color: Colors.redAccent),
-              onPressed: () {
-                Provider.of<SessionProvider>(context, listen: false).deleteSession(widget.session!.id);
-                Navigator.pop(context);
+              onPressed: () async {
+                try {
+                  await Provider.of<SessionProvider>(context, listen: false).deleteSession(widget.session!.id);
+                  if (context.mounted) Navigator.pop(context);
+                } catch (e) {
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Could not delete: $e')),
+                  );
+                }
               },
             )
         ],

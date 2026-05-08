@@ -39,15 +39,20 @@ class SessionModel extends SessionEntity {
   }
 
   factory SessionModel.fromMap(Map<String, dynamic> map) {
+    final dateRaw = map['date'];
+    final date = dateRaw is DateTime
+        ? dateRaw
+        : DateTime.parse(dateRaw as String);
+
     return SessionModel(
       id: map['id'] as String,
       mentorName: map['mentor_name'] as String,
       menteeName: map['mentee_name'] as String,
-      date: DateTime.parse(map['date'] as String),
-      sessionNumber: map['session_number'] as int,
-      topicsDiscussed: map['topics_discussed'] as String,
-      actionItems: map['action_items'] as String,
-      mentorComments: map['mentor_comments'] as String?,
+      date: date,
+      sessionNumber: (map['session_number'] as num).toInt(),
+      topicsDiscussed: map['topics_discussed'] as String? ?? '',
+      actionItems: map['action_items'] as String? ?? '',
+      mentorComments: map['mentor_comments'] as String? ?? '',
     );
   }
 }

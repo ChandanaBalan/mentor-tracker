@@ -24,16 +24,21 @@ class SessionProvider with ChangeNotifier {
   List<SessionEntity> _sessions = [];
 
   bool _isLoading = false;
+  String? _errorMessage;
 
   UserRole get currentRole => _currentRole;
   List<SessionEntity> get sessions => _sessions;
   bool get isLoading => _isLoading;
+  String? get errorMessage => _errorMessage;
 
   Future<void> _loadSessions() async {
     _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
     try {
       _sessions = await getSessionsUseCase(NoParams());
+    } catch (e) {
+      _errorMessage = e.toString();
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -47,15 +52,31 @@ class SessionProvider with ChangeNotifier {
 
   Future<void> saveSession(SessionEntity session) async {
     _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
-    await saveSessionUseCase(session);
-    await _loadSessions();
+    try {
+      await saveSessionUseCase(session);
+      await _loadSessions();
+    } catch (e) {
+      _errorMessage = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      rethrow;
+    }
   }
 
   Future<void> deleteSession(String id) async {
     _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
-    await deleteSessionUseCase(id);
-    await _loadSessions();
+    try {
+      await deleteSessionUseCase(id);
+      await _loadSessions();
+    } catch (e) {
+      _errorMessage = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      rethrow;
+    }
   }
 }

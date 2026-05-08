@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'core/config/supabase_config.dart';
 import 'features/sessions/data/datasources/session_remote_data_source.dart';
 import 'features/sessions/data/repositories/session_repository_impl.dart';
 import 'features/sessions/domain/usecases/get_sessions.dart';
@@ -15,8 +16,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Supabase.initialize(
-    url: 'https://catftjxyuybmdszwddvz.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhdGZ0anh5dXlibWRzendkZHZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxMjc5MjIsImV4cCI6MjA5MzcwMzkyMn0.rubi4l6d_PuCnjNnvjYupoTiInJZ21JRYTpcL0o3NIY',
+    url: SupabaseConfig.url,
+    anonKey: SupabaseConfig.anonKey,
   );
 
   final supabaseClient = Supabase.instance.client;

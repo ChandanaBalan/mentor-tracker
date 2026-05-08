@@ -45,22 +45,24 @@ class DashboardScreen extends StatelessWidget {
             colors: [Color(0xFF121212), Color(0xFF1A1A2E)],
           ),
         ),
-        child: sessionProvider.sessions.isEmpty
-            ? const Center(
-                child: Text(
-                  'No sessions found.\nClick the + button to add one.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white54, fontSize: 18),
+        child: Column(
+          children: [
+            if (sessionProvider.errorMessage != null)
+              Material(
+                color: Colors.red.shade900.withValues(alpha: 0.9),
+                child: ListTile(
+                  leading: const Icon(Icons.error_outline, color: Colors.white),
+                  title: Text(
+                    sessionProvider.errorMessage!,
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                  ),
                 ),
-              )
-            : ListView.builder(
-                padding: const EdgeInsets.all(24.0),
-                itemCount: sessionProvider.sessions.length,
-                itemBuilder: (context, index) {
-                  final session = sessionProvider.sessions[index];
-                  return _SessionCard(session: session);
-                },
               ),
+            Expanded(
+              child: _DashboardBody(sessionProvider: sessionProvider),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
@@ -75,6 +77,32 @@ class DashboardScreen extends StatelessWidget {
         foregroundColor: Colors.white,
       ),
     );
+  }
+}
+
+class _DashboardBody extends StatelessWidget {
+  final SessionProvider sessionProvider;
+
+  const _DashboardBody({required this.sessionProvider});
+
+  @override
+  Widget build(BuildContext context) {
+    return sessionProvider.sessions.isEmpty
+        ? const Center(
+            child: Text(
+              'No sessions found.\nClick the + button to add one.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white54, fontSize: 18),
+            ),
+          )
+        : ListView.builder(
+            padding: const EdgeInsets.all(24.0),
+            itemCount: sessionProvider.sessions.length,
+            itemBuilder: (context, index) {
+              final session = sessionProvider.sessions[index];
+              return _SessionCard(session: session);
+            },
+          );
   }
 }
 

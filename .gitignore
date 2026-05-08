@@ -33,6 +33,9 @@ migrate_working_dir/
 /build/
 /coverage/
 
+# Local Flutter SDK clone (e.g. if you run scripts/vercel_build.sh on Linux/macOS)
+.flutter/
+
 # Symbolication related
 app.*.symbols
 

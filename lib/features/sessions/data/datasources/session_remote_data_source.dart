@@ -23,7 +23,10 @@ class SessionRemoteDataSourceImpl implements SessionRemoteDataSource {
 
   @override
   Future<void> saveSession(SessionModel session) async {
-    await supabaseClient.from('sessions').upsert(session.toMap());
+    await supabaseClient.from('sessions').upsert(
+          session.toMap(),
+          onConflict: 'id',
+        );
   }
 
   @override
