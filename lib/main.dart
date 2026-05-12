@@ -15,32 +15,59 @@ import 'features/sessions/presentation/pages/dashboard_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Supabase.initialize(
-    url: SupabaseConfig.url,
-    anonKey: SupabaseConfig.anonKey,
-  );
+  try {
+    // Initialize Supabase
+    await Supabase.initialize(
+      url: SupabaseConfig.url,
+      anonKey: SupabaseConfig.anonKey,
+    );
 
-  final supabaseClient = Supabase.instance.client;
-  final dataSource = SessionRemoteDataSourceImpl(supabaseClient: supabaseClient);
-  final repository = SessionRepositoryImpl(remoteDataSource: dataSource);
-  final getSessions = GetSessions(repository);
-  final saveSession = SaveSession(repository);
-  final deleteSession = DeleteSession(repository);
+    final supabaseClient = Supabase.instance.client;
+    final dataSource = SessionRemoteDataSourceImpl(
+      supabaseClient: supabaseClient,
+    );
+    final repository = SessionRepositoryImpl(remoteDataSource: dataSource);
+    final getSessions = GetSessions(repository);
+    final saveSession = SaveSession(repository);
+    final deleteSession = DeleteSession(repository);
 
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (_) => SessionProvider(
-            getSessionsUseCase: getSessions,
-            saveSessionUseCase: saveSession,
-            deleteSessionUseCase: deleteSession,
+    runApp(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (_) => SessionProvider(
+              getSessionsUseCase: getSessions,
+              saveSessionUseCase: saveSession,
+              deleteSessionUseCase: deleteSession,
+            ),
+          ),
+        ],
+        child: const MentorTrackerApp(),
+      ),
+    );
+  } catch (e, stackTrace) {
+    debugPrint('Initialization error: $e');
+    debugPrintStack(stackTrace: stackTrace);
+
+    runApp(
+      MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(
+          backgroundColor: Colors.black,
+          body: Center(
+            child: Padding(
+              padding: EdgeInsets.all(24.0),
+              child: Text(
+                'Application failed to start.\n\nError:\n$e',
+                style: TextStyle(color: Colors.redAccent, fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+            ),
           ),
         ),
-      ],
-      child: const MentorTrackerApp(),
-    ),
-  );
+      ),
+    );
+  }
 }
 
 class MentorTrackerApp extends StatelessWidget {
@@ -60,9 +87,7 @@ class MentorTrackerApp extends StatelessWidget {
           secondary: Color(0xFF00FFB2),
           surface: Color(0xFF1E1E1E),
         ),
-        textTheme: GoogleFonts.interTextTheme(
-          ThemeData.dark().textTheme,
-        ),
+        textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.transparent,
           elevation: 0,

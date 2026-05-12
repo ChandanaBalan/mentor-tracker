@@ -1,3 +1,4 @@
+
 /// Supabase project credentials (anon key is safe to ship in client apps).
 /// Prefer overriding via `--dart-define=SUPABASE_URL=...` and
 /// `--dart-define=SUPABASE_ANON_KEY=...` for CI or multiple environments.
@@ -14,4 +15,27 @@ class SupabaseConfig {
     defaultValue:
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhdGZ0anh5dXlibWRzendkZHZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxMjc5MjIsImV4cCI6MjA5MzcwMzkyMn0.rubi4l6d_PuCnjNnvjYupoTiInJZ21JRYTpcL0o3NIY',
   );
+
+  /// Call this before Supabase.initialize() to validate the config.
+  static void validate() {
+    if (url.isEmpty) {
+      throw Exception('Supabase URL is empty.');
+    }
+
+    if (!url.startsWith('https://')) {
+      throw Exception(
+        'Supabase URL is invalid. It must start with https://',
+      );
+    }
+
+    if (anonKey.isEmpty) {
+      throw Exception('Supabase anon key is empty.');
+    }
+
+    if (anonKey == 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhdGZ0anh5dXlibWRzendkZHZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxMjc5MjIsImV4cCI6MjA5MzcwMzkyMn0.rubi4l6d_PuCnjNnvjYupoTiInJZ21JRYTpcL0o3NIY') {
+      throw Exception(
+        'Supabase anon key has not been replaced with the real key.',
+      );
+    }
+  }
 }
